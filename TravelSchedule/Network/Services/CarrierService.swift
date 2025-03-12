@@ -16,12 +16,11 @@ protocol CarrierServiceProtocol {
 }
 
 final class CarrierService: CarrierServiceProtocol {
+    
     private let client: Client
-    private let apikey: String
 
-    init(client: Client, apikey: String) {
+    init(client: Client) {
         self.client = client
-        self.apikey = apikey
     }
 
     func getCarrier(code: String) async throws -> CarriersResponse {

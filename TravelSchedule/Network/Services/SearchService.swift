@@ -16,20 +16,18 @@ protocol SearchServiceProtocol {
 }
 
 final class SearchService: SearchServiceProtocol {
-    private let client: Client
-    private let apikey: String
     
-    init(client: Client, apikey: String) {
+    private let client: Client
+    
+    init(client: Client) {
         self.client = client
-        self.apikey = apikey
     }
     
     func search(from: String, to: String) async throws -> SearchResponse {
         
         let response = try await client.getSearch(query: .init(
             from: from,
-            to: to,
-            apikey: self.apikey
+            to: to
         ))
         
         return try response.ok.body.json
