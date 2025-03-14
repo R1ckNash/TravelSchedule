@@ -9,11 +9,12 @@ import OpenAPIRuntime
 import OpenAPIURLSession
 import Foundation
 
-typealias StationsResponse = Components.Schemas.StationsResponse
+
+typealias StationsList = Components.Schemas.Station
 
 protocol StationsListServiceProtocol {
     
-    func getStationsList() async throws -> StationsResponse
+    func getListOfAllStations() async throws -> StationsList
 }
 
 final class StationsListService: StationsListServiceProtocol {
@@ -23,23 +24,11 @@ final class StationsListService: StationsListServiceProtocol {
         self.client = client
     }
     
-    func getStationsList() async throws -> StationsResponse {
-        
-           let response = try await client.getStationsList(query: .init(format: .json))
-           
-           switch try response.ok.body {
-           case .html(let body):
-               return try await convertHtmlToJson(body: body)
-           case .json(let json):
-               return json
-           }
-       }
-       
-       private func convertHtmlToJson(body: HTTPBody) async throws -> StationsResponse {
-           
-           let data = try await Data(collecting: body, upTo: .max)
-           let result = try JSONDecoder().decode(StationsResponse.self, from: data)
-           
-           return result
-       }
+    func  getListOfAllStations() async  throws -> StationsList {
+        let response = try await client.getStationsList()
+        let httpBody = try response.ok.body.html
+        let data = try await Data(collecting: httpBody, upTo: 100 * 1024 * 1024)
+        let stationList = try JSONDecoder().decode(StationsList.self, from: data)
+        return stationList
+    }
 }
